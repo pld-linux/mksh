@@ -28,7 +28,7 @@ shells.
 
 
 %prep
-%setup -q -T
+%setup -q -T -c %{name}-%{version}
 gzip -dc %{SOURCE0} | cpio -mid
 mv mksh/* ./ ; rm -fr mksh
 cp "%{SOURCE1}" ./
