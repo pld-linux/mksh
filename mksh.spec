@@ -16,31 +16,30 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 mksh is the MirBSD enhanced version of the Public Domain Korn shell
-(pdksh), a bourne-compatible shell which is largely si- milar to the
+(pdksh), a bourne-compatible shell which is largely similar to the
 original AT&T Korn shell. It includes bug fixes and feature
 improvements in order to produce a modern, robust shell good for
 interactive and especially script use. It has UTF-8 support in the
-emacs command line editing mode; corres- ponds to OpenBSD 4.2-current
+emacs command line editing mode; corresponds to OpenBSD 4.2-current
 ksh sans GNU bash-like $PS1; the build environment requirements are
 autoconfigured; throughout code simplification/bugfix/enhancement has
 been done, and the shell has extended compatibility to other modern
 shells.
 
-
 %prep
-%setup -q -T -c %{name}-%{version}
+%setup -qcT
 gzip -dc %{SOURCE0} | cpio -mid
-mv mksh/* ./ ; rm -fr mksh
-cp "%{SOURCE1}" ./
+mv mksh/* ./
+rm -rf mksh
+cp %{SOURCE1} .
 
 %build
-CC="%__cc" CFLAGS="%{optflags}" sh ./Build.sh -Q -r -j
+CC="%{__cc}" CFLAGS="%{rpmcflags}" sh ./Build.sh -Q -r -j
 ./test.sh -v
 
 %install
 rm -rf $RPM_BUILD_ROOT
-
-install -D mksh   $RPM_BUILD_ROOT%{_bindir}/mksh
+install -D mksh	$RPM_BUILD_ROOT%{_bindir}/mksh
 install -D mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
 
 %clean
@@ -50,28 +49,28 @@ rm -rf $RPM_BUILD_ROOT
 t = {}
 f = io.open("/etc/shells", "r")
 if f then
-   for l in f:lines() do t[l]=l; end
-   f:close()
+	for l in f:lines() do t[l]=l; end
+	f:close()
 end
 for _, s in ipairs({"/bin/mksh", "/bin/sh"}) do
-   if not t[s] then
-      f = io.open("/etc/shells", "a"); f:write(s.."\n"); f:close()
-   end
+	if not t[s] then
+		f = io.open("/etc/shells", "a"); f:write(s.."\n"); f:close()
+	end
 end
 
 %preun -p <lua>
 if arg[2] == "0" then
-   f = io.open("/etc/shells", "r")
-   if f then
-      s=""
-      for l in f:lines() do
-        if not string.match(l,"^/bin/mksh$") then
-           s=s..l.."\n"
-        end
-      end
-      f:close()
-      io.open("/etc/shells", "w"):write(s)
-   end
+	f = io.open("/etc/shells", "r")
+	if f then
+		s=""
+		for l in f:lines() do
+			if not string.match(l,"^/bin/mksh$") then
+				s=s..l.."\n"
+			end
+		end
+		f:close()
+		io.open("/etc/shells", "w"):write(s)
+	end
 end
 
 %files
