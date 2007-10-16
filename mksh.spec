@@ -52,7 +52,7 @@ if f then
 	for l in f:lines() do t[l]=l; end
 	f:close()
 end
-for _, s in ipairs({"/bin/mksh", "/bin/sh"}) do
+for _, s in ipairs({"/bin/mksh"}) do
 	if not t[s] then
 		f = io.open("/etc/shells", "a"); f:write(s.."\n"); f:close()
 	end
