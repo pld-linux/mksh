@@ -1,4 +1,5 @@
 Summary:	MirBSD Korn Shell
+Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	31d
 Release:	0.1
@@ -16,7 +17,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 mksh is the MirBSD enhanced version of the Public Domain Korn shell
-(pdksh), a bourne-compatible shell which is largely similar to the
+(pdksh), a Bourne-compatible shell which is largely similar to the
 original AT&T Korn shell. It includes bug fixes and feature
 improvements in order to produce a modern, robust shell good for
 interactive and especially script use. It has UTF-8 support in the
@@ -25,6 +26,18 @@ ksh sans GNU bash-like $PS1; the build environment requirements are
 autoconfigured; throughout code simplification/bugfix/enhancement has
 been done, and the shell has extended compatibility to other modern
 shells.
+
+%description -l pl.UTF-8
+mksh to pochodząca z MirBSD rozszerzona wersja powłoki Public Domain
+Korn Shell (pdksh) - kompatybilnej z powłoką Bourne'a, w większości
+zbliżonej do oryginalnej powłoki Korna z AT&T. Zawiera poprawki błędów
+i rozszerzenia mające na celu stworzenie współczesnej powłoki o
+bogatych możliwościach do użytku interaktywnego i (zwłaszcza) w
+skryptach. Ma obsługę UTF-8 w trybie edycji linii poleceń w stylu
+emacsa; $PS1 odpowiada temu z ksh obecnym w OpenBSD 4.2-current;
+środowisko budowania jest automatycznie konfigurowane; dzięki
+wykonanym uproszczeniom kodu, poprawkom i rozszerzeniom powłoka ma
+rozszerzoną kompatybilność z innymi współczesnymi powłokami.
 
 %prep
 %setup -qcT
