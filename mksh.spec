@@ -9,8 +9,7 @@ Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
 # Source0-md5:	9962d052a1571ba843965c6253819ac4
 Source1:	http://www.mirbsd.org/MirOS/dist/hosted/other/arc4random.c
 URL:		http://mirbsd.de/mksh
-Requires(pre):	FHS
-Requires:	setup >= 2.4.6-2
+BuildRequires:	rpmbuild(macros) >= 1.462
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir			/bin
@@ -42,9 +41,8 @@ rozszerzoną kompatybilność z innymi współczesnymi powłokami.
 %prep
 %setup -qcT
 gzip -dc %{SOURCE0} | cpio -mid
-mv mksh/* ./
-rm -rf mksh
-cp %{SOURCE1} .
+mv mksh/* .; rmdir mksh
+cp -a %{SOURCE1} .
 
 %build
 CC="%{__cc}" CFLAGS="%{rpmcflags}" sh ./Build.sh -Q -r -j
@@ -52,42 +50,23 @@ CC="%{__cc}" CFLAGS="%{rpmcflags}" sh ./Build.sh -Q -r -j
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -D mksh	$RPM_BUILD_ROOT%{_bindir}/mksh
-install -D mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
+install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
+install -p mksh	$RPM_BUILD_ROOT%{_bindir}/mksh
+cp -a mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -p <lua>
-t = {}
-f = io.open("/etc/shells", "r")
-if f then
-	for l in f:lines() do t[l]=l; end
-	f:close()
-end
-for _, s in ipairs({"/bin/mksh"}) do
-	if not t[s] then
-		f = io.open("/etc/shells", "a"); f:write(s.."\n"); f:close()
-	end
-end
+%post	-p <lua>
+%lua_add_etc_shells %{_bindir}/mksh
 
-%preun -p <lua>
-if arg[2] == "0" then
-	f = io.open("/etc/shells", "r")
-	if f then
-		s=""
-		for l in f:lines() do
-			if not string.match(l,"^/bin/mksh$") then
-				s=s..l.."\n"
-			end
-		end
-		f:close()
-		io.open("/etc/shells", "w"):write(s)
-	end
+%preun	-p <lua>
+if arg[2] == 0 then
+	%lua_remove_etc_shells  %{_bindir}/mksh
 end
 
 %files
 %defattr(644,root,root,755)
 %doc dot.mkshrc
 %attr(755,root,root) %{_bindir}/mksh
-%{_mandir}/man1/*
+%{_mandir}/man1/mksh.1*
