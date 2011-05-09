@@ -1,0 +1,15 @@
+--- check.pl~	2011-05-09 14:35:34.357336648 +0100
++++ check.pl	2011-05-09 14:48:30.991232019 +0100
+@@ -324,7 +324,11 @@
+     local($sig, $exitcode) = ('', 1);
+ 
+     if ($_[0] eq 'ok') {
+-	$exitcode = 0;
++        unless ($nxfailed) {
++	    $exitcode = 0;
++        } else {
++            $exitcode = 1;
++        }
+     } elsif ($_[0] ne '') {
+ 	$sig = $_[0];
+     }
