@@ -2,14 +2,17 @@
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	39c
+Version:	40
 Release:	0.1
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
-# Source0-md5:	0c3cd172b47eefcdf9a302baa42f5092
-Source1:	http://www.mirbsd.org/MirOS/dist/hosted/other/arc4random.c
-URL:		http://mirbsd.de/mksh
+# Source0-md5:	395a6c5f39c7e2afd8f6504d90ca90bd
+URL:		https://www.mirbsd.org/mksh.htm
+%if %{with tests}
+BuildRequires:	ed
+BuildRequires:	perl-base
+%endif
 BuildRequires:	rpmbuild(macros) >= 1.462
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -43,7 +46,6 @@ rozszerzoną kompatybilność z innymi współczesnymi powłokami.
 %setup -qcT
 gzip -dc %{SOURCE0} | cpio -mid
 mv mksh/* .; rmdir mksh
-cp -a %{SOURCE1} .
 
 %build
 CC="%{__cc}" CFLAGS="%{rpmcppflags} %{rpmcflags}" sh ./Build.sh -Q -r -j
