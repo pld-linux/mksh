@@ -3,7 +3,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	40
-Release:	0.1
+Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
@@ -55,18 +55,18 @@ CC="%{__cc}" CFLAGS="%{rpmcppflags} %{rpmcflags}" sh ./Build.sh -Q -r -j
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
-install -p mksh	$RPM_BUILD_ROOT%{_bindir}/mksh
+install -p mksh $RPM_BUILD_ROOT%{_bindir}/mksh
 cp -a mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-p <lua>
+%post -p <lua>
 %lua_add_etc_shells %{_bindir}/mksh
 
-%preun	-p <lua>
+%preun -p <lua>
 if arg[2] == 0 then
-	%lua_remove_etc_shells  %{_bindir}/mksh
+%lua_remove_etc_shells %{_bindir}/mksh
 end
 
 %files
