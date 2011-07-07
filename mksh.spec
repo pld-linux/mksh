@@ -12,6 +12,7 @@ Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
 # Source0-md5:	395a6c5f39c7e2afd8f6504d90ca90bd
 Source1:	%{name}-mkshrc
 Patch0:		%{name}-mkshrc_support.patch
+Patch1:		%{name}-circumflex.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -78,6 +79,7 @@ gzip -dc %{SOURCE0} | cpio -mid
 mv mksh/* .; rmdir mksh
 
 %patch0 -p0
+%patch1 -p1
 
 %build
 install -d out
