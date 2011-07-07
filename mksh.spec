@@ -1,4 +1,6 @@
+%bcond_without	static
 %bcond_without	tests
+#
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
@@ -15,7 +17,12 @@ URL:		https://www.mirbsd.org/mksh.htm
 BuildRequires:	ed
 BuildRequires:	perl-base
 %endif
+%{?with_static:BuildRequires:   glibc-static}
 BuildRequires:	rpmbuild(macros) >= 1.462
+# is needed for /etc directory existence
+Requires(pre):	FHS
+Requires:	setup >= 2.4.6-2
+Obsoletes:	pdksh
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_bindir			/bin
@@ -44,6 +51,27 @@ emacsa; $PS1 odpowiada temu z ksh obecnym w OpenBSD 4.2-current;
 wykonanym uproszczeniom kodu, poprawkom i rozszerzeniom powłoka ma
 rozszerzoną kompatybilność z innymi współczesnymi powłokami.
 
+%package static
+Summary:	Statically linked the MirBSD enhanced version of pdksh
+Summary(pl.UTF-8):	Skonsolidowana statycznie powłoka mksh
+Group:		Applications/Shells
+# requires base for /etc/mkshrc?
+Requires:	%{name} = %{version}-%{release}
+
+%description static
+mksh is the MirBSD enhanced version of the Public Domain Korn shell
+(pdksh), a Bourne-compatible shell which is largely similar to the
+original AT&T Korn shell.
+
+This packege contains statically linked version of mksh.
+
+%description static -l pl.UTF-8
+mksh to pochodząca z MirBSD rozszerzona wersja powłoki Public Domain
+Korn Shell (pdksh) - kompatybilnej z powłoką Bourne'a, w większości
+zbliżonej do oryginalnej powłoki Korna z AT&T.
+
+W tym pakiecie jest mkksh skonsolidowany statycznie.
+
 %prep
 %setup -qcT
 gzip -dc %{SOURCE0} | cpio -mid
@@ -52,27 +80,47 @@ mv mksh/* .; rmdir mksh
 %patch0 -p0
 
 %build
-CC="%{__cc}" CFLAGS="%{rpmcppflags} %{rpmcflags}" sh ./Build.sh -Q -r -j
+install -d out
+
+CC="%{__cc}" \
+CFLAGS="%{rpmcppflags} %{rpmcflags}" \
+LDFLAGS="%{rpmldflags}" \
+sh ./Build.sh -Q -r -j
 
 %{?with_tests:./test.sh -v}
+mv mksh out/mksh.dynamic
+
+%if %{with static}
+CC="%{__cc}" \
+CFLAGS="%{rpmcppflags} %{rpmcflags}" \
+LDFLAGS="%{rpmldflags} -static" \
+sh ./Build.sh -Q -r -j
+
+%{?with_tests:./test.sh -v}
+mv mksh out/mksh.static
+%endif
+
+ln -sf mksh $RPM_BUILD_ROOT/bin/sh
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
-install -p mksh $RPM_BUILD_ROOT%{_bindir}/mksh
+install -p out/mksh.dynamic $RPM_BUILD_ROOT%{_bindir}/mksh
+%{?with_static:install -p out/mksh.static $RPM_BUILD_ROOT%{_bindir}/mksh.static}
+
 cp -a mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
+echo ".so mksh.1" > $RPM_BUILD_ROOT%{_mandir}/man1/sh.1
+
 install -D %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/mkshrc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post -p <lua>
-%lua_add_etc_shells %{_bindir}/mksh
+%post   -p %add_etc_shells -p /bin/sh /bin/mksh
+%preun  -p %remove_etc_shells -p /bin/sh /bin/mksh
 
-%preun -p <lua>
-if arg[2] == 0 then
-%lua_remove_etc_shells %{_bindir}/mksh
-end
+%post static -p %add_etc_shells -p /bin/mksh.static
+%preun static -p %remove_etc_shells -p /bin/mksh.static
 
 %files
 %defattr(644,root,root,755)
@@ -80,3 +128,10 @@ end
 %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
 %attr(755,root,root) %{_bindir}/mksh
 %{_mandir}/man1/mksh.1*
+%{_mandir}/man1/sh.1*
+
+%if %{with static}
+%files static
+%defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/mksh.static
+%endif
