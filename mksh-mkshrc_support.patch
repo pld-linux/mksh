@@ -1,13 +1,22 @@
---- main.c~	2011-07-06 20:43:36.679601770 +0100
-+++ main.c	2011-07-06 20:43:28.039694865 +0100
-@@ -532,6 +532,7 @@
- 	else if (Flag(FTALKING)) {
+--- main.c~	2011-07-07 18:15:26.961632040 +0100
++++ main.c	2011-07-07 18:15:50.664694256 +0100
+@@ -532,10 +532,14 @@
  		char *env_file;
  
-+		include("/etc/mkshrc", 0, NULL, 1);
  		/* include $ENV */
- 		env_file = substitute(substitute("${ENV:-" MKSHRC_PATH "}", 0),
- 		    DOTILDE);
+-		env_file = substitute(substitute("${ENV:-" MKSHRC_PATH "}", 0),
+-		    DOTILDE);
++                env_file = substitute("${ENV}", 0);
+ 		if (*env_file != '\0')
+ 			include(env_file, 0, NULL, 1);
++                else { 
++			env_file = substitute(MKSHRC_PATH, DOTILDE);
++			include("/etc/mkshrc", 0, NULL, 1);
++			include(env_file, 0, NULL, 1);
++                        }
+ 	}
+ 
+ 	if (restricted) {
 --- check.t~	2011-07-07 09:55:26.802497928 +0100
 +++ check.t	2011-07-07 09:55:31.859107570 +0100
 @@ -5908,13 +5908,13 @@
