@@ -70,7 +70,7 @@ mksh to pochodząca z MirBSD rozszerzona wersja powłoki Public Domain
 Korn Shell (pdksh) - kompatybilnej z powłoką Bourne'a, w większości
 zbliżonej do oryginalnej powłoki Korna z AT&T.
 
-W tym pakiecie jest mkksh skonsolidowany statycznie.
+W tym pakiecie jest mksh skonsolidowany statycznie.
 
 %prep
 %setup -qcT
@@ -126,6 +126,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc dot.mkshrc
 %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
 %attr(755,root,root) %{_bindir}/mksh
+%attr(755,root,root) %{_bindir}/sh
 %{_mandir}/man1/mksh.1*
 %{_mandir}/man1/sh.1*
 
