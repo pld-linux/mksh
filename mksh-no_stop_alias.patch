@@ -1,0 +1,46 @@
+--- mksh-40.org/main.c	2011-07-07 17:21:37.608256172 +0100
++++ mksh-40/main.c	2011-07-07 17:22:44.980829725 +0100
+@@ -73,7 +73,6 @@
+ #if !defined(ANDROID) && !defined(MKSH_UNEMPLOYED)
+ 	/* not in Android for political reasons */
+ 	/* not in ARGE mksh due to no job control */
+-	"stop=kill -STOP",
+ 	"suspend=kill -STOP $$",
+ #endif
+ 	"autoload=typeset -fu",
+--- mksh-40.org/mksh.1	2011-06-12 16:34:43.000000000 +0100
++++ mksh-40/mksh.1	2011-07-07 17:23:08.177234851 +0100
+@@ -1092,7 +1092,6 @@
+ nameref=\*(aqtypeset \-n\*(aq
+ nohup=\*(aqnohup \*(aq
+ r=\*(aqfc \-e \-\*(aq
+-stop=\*(aqkill \-STOP\*(aq
+ suspend=\*(aqkill \-STOP $$\*(aq
+ type=\*(aqwhence \-v\*(aq
+ .Ed
+--- mksh-40.orig/check.t	2011-07-07 17:43:03.450369958 +0100
++++ mksh-40/check.t	2011-07-07 17:43:24.303467293 +0100
+@@ -5941,7 +5941,6 @@
+ 	nohup='nohup '
+ 	r='fc -e -'
+ 	source='PATH=$PATH:. command .'
+-	stop='kill -STOP'
+ 	suspend='kill -STOP $$'
+ 	type='whence -v'
+ ---
+@@ -6010,7 +6009,6 @@
+ 	nohup='nohup '
+ 	r='fc -e -'
+ 	source='PATH=$PATH:. command .'
+-	stop='kill -STOP'
+ 	suspend='kill -STOP $$'
+ 	type='whence -v'
+ ---
+@@ -6034,7 +6032,6 @@
+ 	nohup='nohup '
+ 	r='fc -e -'
+ 	source='PATH=$PATH:. command .'
+-	stop='kill -STOP'
+ 	suspend='kill -STOP $$'
+ 	type='whence -v'
+ ---

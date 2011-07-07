@@ -13,6 +13,7 @@ Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
 Source1:	%{name}-mkshrc
 Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
+Patch2:		%{name}-no_stop_alias.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -80,6 +81,7 @@ mv mksh/* .; rmdir mksh
 
 %patch0 -p0
 %patch1 -p1
+%patch2 -p1
 
 %build
 install -d out
