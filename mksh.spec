@@ -100,8 +100,6 @@ sh ./Build.sh -Q -r -j
 mv mksh out/mksh.static
 %endif
 
-ln -sf mksh $RPM_BUILD_ROOT/bin/sh
-
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
@@ -112,6 +110,7 @@ cp -a mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
 echo ".so mksh.1" > $RPM_BUILD_ROOT%{_mandir}/man1/sh.1
 
 install -D %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/mkshrc
+ln -sf mksh $RPM_BUILD_ROOT%{_bindir}/sh
 
 %clean
 rm -rf $RPM_BUILD_ROOT
