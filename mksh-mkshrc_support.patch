@@ -1,0 +1,33 @@
+--- main.c~	2011-07-06 20:43:36.679601770 +0100
++++ main.c	2011-07-06 20:43:28.039694865 +0100
+@@ -532,6 +532,7 @@
+ 	else if (Flag(FTALKING)) {
+ 		char *env_file;
+ 
++		include("/etc/mkshrc", 0, NULL, 1);
+ 		/* include $ENV */
+ 		env_file = substitute(substitute("${ENV:-" MKSHRC_PATH "}", 0),
+ 		    DOTILDE);
+--- check.t~	2011-07-07 09:55:26.802497928 +0100
++++ check.t	2011-07-07 09:55:31.859107570 +0100
+@@ -5908,13 +5908,13 @@
+ 	Ensure ±U on the command line is honoured
+ 	(this test may pass falsely depending on CPPFLAGS)
+ stdin:
+-	export i=0
+-	code='if [[ $- = *U* ]]; then echo $i on; else echo $i off; fi'
+-	let i++; "$__progname" -U -c "$code"
+-	let i++; "$__progname" +U -c "$code"
+-	let i++; "$__progname" -U -ic "$code"
+-	let i++; "$__progname" +U -ic "$code"
+-	echo $((++i)) done
++	export iter=0
++	code='if [[ $- = *U* ]]; then echo $iter on; else echo $iter off; fi'
++	let iter++; "$__progname" -U -c "$code"
++	let iter++; "$__progname" +U -c "$code"
++	let iter++; "$__progname" -U -ic "$code"
++	let iter++; "$__progname" +U -ic "$code"
++	echo $((++iter)) done
+ expected-stdout:
+ 	1 on
+ 	2 off

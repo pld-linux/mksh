@@ -1,0 +1,49 @@
+# For interactive shell
+
+# PROMPT
+if [ `id -u` -eq 0 ]; then
+	PS1='[${LOGNAME-$USER}@${HOSTNAME} `
+	if [ "$PWD" = "$HOME" ]; then
+		echo "~";
+	elif [ "$PWD" = "/${PWD##*/}" ]; then
+		echo $PWD;	
+	else
+		echo ${PWD##*/};
+	fi`]# '
+else
+	PS1='[${LOGNAME-$USER}@${HOSTNAME} `
+	if [ "$PWD" = "$HOME" ]; then
+		echo "~";
+	elif [ "$PWD" = "/${PWD##*/}" ]; then
+		echo $PWD;	
+	else
+		echo ${PWD##*/};
+	fi`]$ '
+fi
+export PS1
+
+# EDITING FUNCTIONS
+set -o emacs
+bind '^I'=complete >/dev/null 2>&1
+bind '^I'=complete-list >/dev/null 2>&1
+
+case $TERM in
+	nxterm|xterm*|konsole*)
+		bind '^[[H'=beginning-of-line >/dev/null 2>&1
+		bind '^[[F'=end-of-line >/dev/null 2>&1
+		;;
+	linux|rxvt*)
+		bind '^[[1~'=beginning-of-line >/dev/null 2>&1
+		bind '^[[4~'=end-of-line >/dev/null 2>&1
+		;;
+esac
+
+# SYSTEM WIDE ALIASES ETC.
+if [ "`echo /etc/shrc.d/*.sh`" != "/etc/shrc.d/*.sh" ]; then
+	for i in /etc/shrc.d/*.sh ; do
+		. $i
+	done
+	unset i
+fi
+
+# vi:syntax=sh

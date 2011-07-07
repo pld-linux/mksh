@@ -8,6 +8,8 @@ License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
 # Source0-md5:	395a6c5f39c7e2afd8f6504d90ca90bd
+Source1:	%{name}-mkshrc
+Patch0:		%{name}-mkshrc_support.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -47,6 +49,8 @@ rozszerzoną kompatybilność z innymi współczesnymi powłokami.
 gzip -dc %{SOURCE0} | cpio -mid
 mv mksh/* .; rmdir mksh
 
+%patch0 -p0
+
 %build
 CC="%{__cc}" CFLAGS="%{rpmcppflags} %{rpmcflags}" sh ./Build.sh -Q -r -j
 
@@ -57,6 +61,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{_bindir},%{_mandir}/man1}
 install -p mksh $RPM_BUILD_ROOT%{_bindir}/mksh
 cp -a mksh.1 $RPM_BUILD_ROOT%{_mandir}/man1/mksh.1
+install -D %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/mkshrc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -72,5 +77,6 @@ end
 %files
 %defattr(644,root,root,755)
 %doc dot.mkshrc
+%config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
 %attr(755,root,root) %{_bindir}/mksh
 %{_mandir}/man1/mksh.1*
