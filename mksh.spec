@@ -97,14 +97,10 @@ sh ./Build.sh -Q -r -j
 
 # skip some tests if not on terminal
 if ! tty -s; then
-do_tests=$(awk '
-/^---/ { if (need_ctty == 0) { print name; }; need_ctty=0; }
-/^name:/ { name=$2; }
-/^need-ctty:/ { need_ctty=1; }
-' check.t)
+	skip_tests="-C regress:no-ctty"
 fi
 
-%{?with_tests:./test.sh -v $do_tests}
+%{?with_tests:./test.sh -v $skip_tests}
 mv mksh out/mksh.dynamic
 
 %if %{with static}
@@ -113,7 +109,7 @@ CFLAGS="%{rpmcppflags} %{rpmcflags}" \
 LDFLAGS="%{rpmldflags} -static" \
 sh ./Build.sh -Q -r -j
 
-%{?with_tests:./test.sh -v $do_tests}
+%{?with_tests:./test.sh -v $skip_tests}
 mv mksh out/mksh.static
 %endif
 
