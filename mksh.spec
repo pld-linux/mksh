@@ -15,6 +15,7 @@ Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
 Patch2:		%{name}-no_stop_alias.patch
 Patch3:		%{name}-tty.patch
+Patch4:		%{name}-test.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -84,6 +85,7 @@ mv mksh/* .; rmdir mksh
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 %build
 install -d out
