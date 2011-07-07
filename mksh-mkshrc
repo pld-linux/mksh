@@ -46,4 +46,6 @@ if [ "`echo /etc/shrc.d/*.sh`" != "/etc/shrc.d/*.sh" ]; then
 	unset i
 fi
 
+HISTFILE=~/.history.mksh
+
 # vi:syntax=sh
