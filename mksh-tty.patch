@@ -1,0 +1,11 @@
+--- mksh-40/var.c~	2011-07-07 21:48:19.000000000 +0200
++++ mksh-40/var.c	2011-07-07 22:08:36.466887894 +0200
+@@ -1442,7 +1442,7 @@
+ #ifdef TIOCGWINSZ
+ 		if (tty_fd < 0)
+ 			/* non-FTALKING, try to get an fd anyway */
+-			tty_init(false, false);
++			tty_init(true, false);
+ #endif
+ 		x_cols = -1;
+ 	}

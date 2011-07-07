@@ -5,7 +5,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	40
-Release:	1
+Release:	1.1
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
@@ -14,6 +14,7 @@ Source1:	%{name}-mkshrc
 Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
 Patch2:		%{name}-no_stop_alias.patch
+Patch3:		%{name}-tty.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -82,6 +83,7 @@ mv mksh/* .; rmdir mksh
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %build
 install -d out
@@ -116,6 +118,9 @@ echo ".so mksh.1" > $RPM_BUILD_ROOT%{_mandir}/man1/sh.1
 install -D %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/mkshrc
 ln -sf mksh $RPM_BUILD_ROOT%{_bindir}/sh
 
+# some pdksh scripts used that
+ln -sf mksh $RPM_BUILD_ROOT%{_bindir}/ksh
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -132,6 +137,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc dot.mkshrc
 %config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
 %attr(755,root,root) %{_bindir}/mksh
+%attr(755,root,root) %{_bindir}/ksh
 %attr(755,root,root) %{_bindir}/sh
 %{_mandir}/man1/mksh.1*
 %{_mandir}/man1/sh.1*
