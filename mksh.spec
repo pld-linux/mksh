@@ -118,6 +118,8 @@ rm -rf $RPM_BUILD_ROOT
 %post   -p %add_etc_shells -p /bin/sh /bin/mksh
 %preun  -p %remove_etc_shells -p /bin/sh /bin/mksh
 
+%posttrans -p %add_etc_shells -p /bin/sh
+
 %post static -p %add_etc_shells -p /bin/mksh.static
 %preun static -p %remove_etc_shells -p /bin/mksh.static
 
