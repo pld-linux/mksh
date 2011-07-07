@@ -6,7 +6,7 @@
  		/* include $ENV */
 -		env_file = substitute(substitute("${ENV:-" MKSHRC_PATH "}", 0),
 -		    DOTILDE);
-+                env_file = substitute("${ENV}", 0);
++                env_file = substitute(substitute("${ENV}", 0), DOTILDE);
  		if (*env_file != '\0')
  			include(env_file, 0, NULL, 1);
 +                else { 
@@ -17,26 +17,3 @@
  	}
  
  	if (restricted) {
---- check.t~	2011-07-07 09:55:26.802497928 +0100
-+++ check.t	2011-07-07 09:55:31.859107570 +0100
-@@ -5908,13 +5908,13 @@
- 	Ensure ±U on the command line is honoured
- 	(this test may pass falsely depending on CPPFLAGS)
- stdin:
--	export i=0
--	code='if [[ $- = *U* ]]; then echo $i on; else echo $i off; fi'
--	let i++; "$__progname" -U -c "$code"
--	let i++; "$__progname" +U -c "$code"
--	let i++; "$__progname" -U -ic "$code"
--	let i++; "$__progname" +U -ic "$code"
--	echo $((++i)) done
-+	export iter=0
-+	code='if [[ $- = *U* ]]; then echo $iter on; else echo $iter off; fi'
-+	let iter++; "$__progname" -U -c "$code"
-+	let iter++; "$__progname" +U -c "$code"
-+	let iter++; "$__progname" -U -ic "$code"
-+	let iter++; "$__progname" +U -ic "$code"
-+	echo $((++iter)) done
- expected-stdout:
- 	1 on
- 	2 off
