@@ -131,10 +131,11 @@ ln -sf mksh $RPM_BUILD_ROOT%{_bindir}/ksh
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post   -p %add_etc_shells -p /bin/sh /bin/mksh
-%preun  -p %remove_etc_shells -p /bin/sh /bin/mksh
+%post   -p %add_etc_shells -p /bin/sh /bin/ksh /bin/mksh
+%preun  -p %remove_etc_shells -p /bin/sh /bin/ksh /bin/mksh
 
-%posttrans -p %add_etc_shells -p /bin/sh
+%posttrans -p %add_etc_shells -p /bin/sh /bin/ksh
+
 
 %post static -p %add_etc_shells -p /bin/mksh.static
 %preun static -p %remove_etc_shells -p /bin/mksh.static
