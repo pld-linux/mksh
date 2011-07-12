@@ -16,6 +16,7 @@ Patch1:		%{name}-circumflex.patch
 Patch2:		%{name}-no_stop_alias.patch
 Patch3:		%{name}-tty.patch
 Patch4:		%{name}-test.patch
+Patch5:		%{name}-distro.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -86,6 +87,9 @@ mv mksh/* .; rmdir mksh
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
+
+sed -i -e 's#@DISTRO@# PLD/Linux 3.0#g' check.t sh.h
 
 %build
 install -d out
