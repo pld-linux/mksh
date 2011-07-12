@@ -89,7 +89,7 @@ mv mksh/* .; rmdir mksh
 %patch4 -p1
 %patch5 -p1
 
-sed -i -e 's#@DISTRO@# PLD/Linux 3.0#g' check.t sh.h
+sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
 
 %build
 install -d out
