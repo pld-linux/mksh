@@ -5,7 +5,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	40b
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
@@ -15,6 +15,7 @@ Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
 Patch2:		%{name}-no_stop_alias.patch
 Patch3:		%{name}-distro.patch
+Patch4:		%{name}-cmdline-length.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -84,6 +85,7 @@ mv mksh/* .; rmdir mksh
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
 

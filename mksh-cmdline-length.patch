@@ -1,0 +1,11 @@
+--- mksh-40b/sh.h~	2011-10-15 20:27:37.000000000 +0200
++++ mksh-40b/sh.h	2011-10-18 17:56:07.152596641 +0200
+@@ -381,7 +381,7 @@
+ #define NOT		'!'	/* might use ^ (ie, [!...] vs [^..]) */
+ #define NOT2		'^'
+ 
+-#define LINE		4096	/* input line size */
++#define LINE		16384	/* input line size */
+ 
+ EXTERN const char *safe_prompt; /* safe prompt if PS1 substitution fails */
+ EXTERN const char initvsn[] I__("KSH_VERSION=@(#)MIRBSD KSH " MKSH_VERSION);
