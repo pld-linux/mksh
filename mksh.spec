@@ -5,7 +5,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	40d
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
@@ -93,8 +93,9 @@ sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
 install -d out
 
 CC="%{__cc}" \
-CFLAGS="%{rpmcppflags} %{rpmcflags}" \
+CFLAGS="%{rpmcflags}" \
 LDFLAGS="%{rpmldflags}" \
+CPPFLAGS="-DMKSH_BINSHREDUCED=1 %{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
 
 # skip some tests if not on terminal
@@ -107,8 +108,9 @@ mv mksh out/mksh.dynamic
 
 %if %{with static}
 CC="%{__cc}" \
-CFLAGS="%{rpmcppflags} %{rpmcflags}" \
+CFLAGS="%{rpmcflags}" \
 LDFLAGS="%{rpmldflags} -static" \
+CPPFLAGS="-DMKSH_BINSHREDUCED=1 %{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
 
 %{?with_tests:./test.sh -v $skip_tests}
