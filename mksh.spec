@@ -95,7 +95,7 @@ install -d out
 CC="%{__cc}" \
 CFLAGS="%{rpmcflags}" \
 LDFLAGS="%{rpmldflags}" \
-CPPFLAGS="-DMKSH_BINSHREDUCED=1 %{rpmcppflags}" \
+CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
 
 # skip some tests if not on terminal
@@ -110,7 +110,7 @@ mv mksh out/mksh.dynamic
 CC="%{__cc}" \
 CFLAGS="%{rpmcflags}" \
 LDFLAGS="%{rpmldflags} -static" \
-CPPFLAGS="-DMKSH_BINSHREDUCED=1 %{rpmcppflags}" \
+CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
 
 %{?with_tests:./test.sh -v $skip_tests}
