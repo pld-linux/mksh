@@ -1,0 +1,31 @@
+diff -u -p -u -p -r1.522 sh.h
+--- sh.h	3 Mar 2012 21:31:21 -0000	1.522
++++ sh.h	9 Mar 2012 15:14:49 -0000
+@@ -855,7 +855,7 @@ EXTERN char	*current_wd;
+  */
+ #define MIN_COLS	(2 + MIN_EDIT_SPACE + 3)
+ #define MIN_LINS	3
+-EXTERN mksh_ari_t x_cols E_INIT(80);	/* tty columns */
++EXTERN mksh_ari_t x_cols E_INIT(-1);	/* tty columns */
+ EXTERN mksh_ari_t x_lins E_INIT(-1);	/* tty lines */
+ 
+ /* These to avoid bracket matching problems */
+diff -u -p -u -p -r1.141 var.c
+--- var.c	3 Mar 2012 21:31:23 -0000	1.141
++++ var.c	9 Mar 2012 15:14:49 -0000
+@@ -1458,14 +1458,13 @@ set_array(const char *var, bool reset, c
+ void
+ change_winsz(void)
+ {
+-	if (x_lins < 0) {
++	if (x_cols < 0 && x_lins < 0) {
+ 		/* first time initialisation */
+ #ifdef TIOCGWINSZ
+ 		if (tty_fd < 0)
+ 			/* non-FTALKING, try to get an fd anyway */
+ 			tty_init(true, false);
+ #endif
+-		x_cols = -1;
+ 	}
+ 
+ #ifdef TIOCGWINSZ
