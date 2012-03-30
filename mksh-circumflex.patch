@@ -4,7 +4,7 @@ diff -ur mksh-40.org//eval.c mksh-40/eval.c
 @@ -887,6 +887,7 @@
  				switch (c) {
  				case '[':
- 				case NOT:
+ 				case '!':
 +				case NOT2:
  				case '-':
  				case ']':
@@ -16,8 +16,8 @@ diff -ur mksh-40.org//misc.c mksh-40/misc.c
  			if (!in_bracket) {
  				saw_glob = true;
  				in_bracket = true;
--				if (ISMAGIC(p[1]) && p[2] == NOT)
-+				if (ISMAGIC(p[1]) && (p[2] == NOT || p[2] == NOT2))
+-				if (ISMAGIC(p[1]) && p[2] == '!')
++				if (ISMAGIC(p[1]) && (p[2] == '!' || p[2] == NOT2))
  					p += 2;
  				if (ISMAGIC(p[1]) && p[2] == ']')
  					p += 2;
@@ -25,18 +25,17 @@ diff -ur mksh-40.org//misc.c mksh-40/misc.c
  	int c, d, notp, found = 0;
  	const unsigned char *orig_p = p;
  
--	if ((notp = (ISMAGIC(*p) && *++p == NOT)))
-+	if ((notp = (ISMAGIC(*p) && (*++p == NOT || *p == NOT2))))
+-	if ((notp = (ISMAGIC(*p) && *++p == '!')))
++	if ((notp = (ISMAGIC(*p) && (*++p == '!' || *p == NOT2))))
  		p++;
  	do {
  		c = *p++;
 diff -ur mksh-40.org//sh.h mksh-40/sh.h
 --- mksh-40.org//sh.h	2011-06-12 16:59:09.000000000 +0200
 +++ mksh-40/sh.h	2011-07-07 18:29:16.346761511 +0200
-@@ -380,6 +380,7 @@
+@@ -380,5 +380,6 @@
  #define MAGIC		(7)	/* prefix for *?[!{,} during expand */
  #define ISMAGIC(c)	((unsigned char)(c) == MAGIC)
- #define NOT		'!'	/* might use ^ (ie, [!...] vs [^..]) */
 +#define NOT2		'^'
  
  #define LINE		4096	/* input line size */
@@ -48,8 +47,8 @@ diff -ur mksh-40.org//tree.c mksh-40/tree.c
  		case CHAR:
  			c = *wp++;
  			if ((opmode & WDS_MAGIC) &&
--			    (ISMAGIC(c) || c == '[' || c == NOT ||
-+			    (ISMAGIC(c) || c == '[' || c == NOT || c == NOT2 ||
+-			    (ISMAGIC(c) || c == '[' || c == '!' ||
++			    (ISMAGIC(c) || c == '[' || c == '!' || c == NOT2 ||
  			    c == '-' || c == ']' || c == '*' || c == '?'))
  				shf_putc(MAGIC, shf);
  			shf_putc(c, shf);

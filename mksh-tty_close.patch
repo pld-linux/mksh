@@ -1,0 +1,23 @@
+commit 04ac6ad16336a70603c4817d678f9a1eddd18c74
+Author: tg <tg>
+Date:   Sun Mar 25 14:28:11 2012 +0000
+
+    fix regression w.r.t. TTY and external programmes:
+    • release the TTY after the initial change_winsz()
+    • since we release it, we can skip initialising tty_state, too
+
+diff --git a/main.c b/main.c
+index 8022782..0405b1b 100644
+--- a/main.c
++++ b/main.c
+@@ -252,8 +252,9 @@ main_init(int argc, const char *argv[], Source **sp, struct block **lp)
+ 
+ #ifdef TIOCGWINSZ
+ 	/* try to initialise tty size before importing environment */
+-	tty_init(true, false);
++	tty_init(false, false);
+ 	change_winsz();
++	tty_close();
+ #endif
+ 
+ #ifdef _PATH_DEFPATH
