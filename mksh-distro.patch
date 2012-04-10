@@ -5,8 +5,8 @@ diff -ur mksh.org/check.t mksh/check.t
  # http://www.research.att.com/~gsf/public/ifs.sh
  
  expected-stdout:
--	@(#)MIRBSD KSH R40 2012/03/20
-+	@(#)MIRBSD KSH R40 2012/03/20 @DISTRO@
+-	@(#)MIRBSD KSH R40 2012/04/06
++	@(#)MIRBSD KSH R40 2012/04/06 @DISTRO@
  description:
  	Check version of shell.
  stdin:
@@ -17,8 +17,8 @@ diff -ur mksh.org/sh.h mksh/sh.h
  #ifdef EXTERN
  __RCSID("$MirOS: src/bin/mksh/sh.h,v 1.484.2.16 2012/03/24 21:22:43 tg Exp $");
  #endif
--#define MKSH_VERSION "R40 2012/03/20"
-+#define MKSH_VERSION "R40 2012/03/20 @DISTRO@"
+-#define MKSH_VERSION "R40 2012/04/06"
++#define MKSH_VERSION "R40 2012/04/06 @DISTRO@"
  
  /* arithmetic types: C implementation */
  #if !HAVE_CAN_INTTYPES
