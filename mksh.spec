@@ -4,12 +4,12 @@
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	40f
+Version:	41
 Release:	1
 License:	BSD
 Group:		Applications/Shells
-Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.cpio.gz
-# Source0-md5:	22c9570660c2efadf36de7b620d06966
+Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
+# Source0-md5:	70eca50d9340412714ef09b7060ebde9
 Source1:	%{name}-mkshrc
 Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
@@ -89,11 +89,46 @@ mv mksh/* .; rmdir mksh
 
 sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
 
+# we'll need this later due to -DMKSH_GCC55009
+cat >rtchecks <<'EOF'
+typeset -i sari=0
+typeset -Ui uari=0
+typeset -i x=0
+print -r -- $((x++)):$sari=$uari.
+let --sari --uari
+print -r -- $((x++)):$sari=$uari.
+sari=2147483647 uari=2147483647
+print -r -- $((x++)):$sari=$uari.
+let ++sari ++uari
+print -r -- $((x++)):$sari=$uari.
+let --sari --uari
+let 'sari *= 2' 'uari *= 2'
+let ++sari ++uari
+print -r -- $((x++)):$sari=$uari.
+let ++sari ++uari
+print -r -- $((x++)):$sari=$uari.
+sari=-2147483648 uari=-2147483648
+print -r -- $((x++)):$sari=$uari.
+let --sari --uari
+print -r -- $((x++)):$sari=$uari.
+EOF
+
+cat >rtchecks.expected <<'EOF'
+0:0=0.
+1:-1=4294967295.
+2:2147483647=2147483647.
+3:-2147483648=2147483648.
+4:-1=4294967295.
+5:0=0.
+6:-2147483648=2147483648.
+7:2147483647=2147483647.
+EOF
+
 %build
 install -d out
 
 CC="%{__cc}" \
-CFLAGS="%{rpmcflags}" \
+CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
 LDFLAGS="%{rpmldflags}" \
 CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
@@ -103,17 +138,33 @@ if ! tty -s; then
 	skip_tests="-C regress:no-ctty"
 fi
 
-%{?with_tests:./test.sh -v $skip_tests}
+%if %{with tests}
+./mksh rtchecks >rtchecks.got 2>&1
+if ! cmp --quiet rtchecks.got rtchecks.expected ; then
+	echo "rtchecks failed"
+	diff -Naurp %{SOURCE3} rtchecks.got
+	exit 1
+fi
+./test.sh -v $skip_tests
+%endif
 mv mksh out/mksh.dynamic
 
 %if %{with static}
 CC="%{__cc}" \
-CFLAGS="%{rpmcflags}" \
+CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
 LDFLAGS="%{rpmldflags} -static" \
 CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
 
-%{?with_tests:./test.sh -v $skip_tests}
+%if %{with tests}
+./test.sh -v $skip_tests
+./mksh rtchecks >rtchecks.got 2>&1
+if ! cmp --quiet rtchecks.got rtchecks.expected ; then
+	echo "rtchecks failed"
+	diff -Naurp %{SOURCE3} rtchecks.got
+	exit 1
+fi
+%endif
 mv mksh out/mksh.static
 %endif
 

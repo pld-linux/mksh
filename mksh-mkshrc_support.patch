@@ -8,11 +8,11 @@
 -		    DOTILDE);
 +                env_file = substitute(substitute("${ENV}", 0), DOTILDE);
  		if (*env_file != '\0')
- 			include(env_file, 0, NULL, 1);
+ 			include(env_file, 0, NULL, true);
 +                else { 
 +			env_file = substitute(MKSHRC_PATH, DOTILDE);
-+			include("/etc/mkshrc", 0, NULL, 1);
-+			include(env_file, 0, NULL, 1);
++			include("/etc/mkshrc", 0, NULL, true);
++			include(env_file, 0, NULL, true);
 +                        }
  	}
  
