@@ -12,21 +12,12 @@ diff -ur mksh-40.org//eval.c mksh-40/eval.c
 diff -ur mksh-40.org//misc.c mksh-40/misc.c
 --- mksh-40.org//misc.c	2011-06-12 16:45:58.000000000 +0200
 +++ mksh-40/misc.c	2011-07-07 18:28:39.015826686 +0200
-@@ -652,7 +652,7 @@
- 			if (!in_bracket) {
- 				saw_glob = true;
- 				in_bracket = true;
--				if (ISMAGIC(p[1]) && p[2] == '!')
-+				if (ISMAGIC(p[1]) && (p[2] == '!' || p[2] == NOT2))
- 					p += 2;
- 				if (ISMAGIC(p[1]) && p[2] == ']')
- 					p += 2;
-@@ -831,7 +831,7 @@
- 	int c, d, notp, found = 0;
+@@ -843,7 +843,7 @@
+ 	bool notp, found = false;
  	const unsigned char *orig_p = p;
  
--	if ((notp = (ISMAGIC(*p) && *++p == '!')))
-+	if ((notp = (ISMAGIC(*p) && (*++p == '!' || *p == NOT2))))
+-	if ((notp = tobool(ISMAGIC(*p) && *++p == '!')))
++	if ((notp = tobool(ISMAGIC(*p) && (*++p == '!' || *p == NOT2))))
  		p++;
  	do {
  		c = *p++;
