@@ -4,18 +4,17 @@
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	42
+Version:	42b
 Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
-# Source0-md5:	f1ad261f79f6ac45e8d5cc5bea191090
+# Source0-md5:	8b4b9182eb63b47390f164246959b661
 Source1:	%{name}-mkshrc
 Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
 Patch2:		%{name}-no_stop_alias.patch
-Patch3:		%{name}-distro.patch
-Patch4:		%{name}-cmdline-length.patch
+Patch3:		%{name}-cmdline-length.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -85,9 +84,16 @@ mv mksh/* .; rmdir mksh
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
+# sed rules instead of patch (needed update for every release)
+sed -i -e 's|\(#define.*MKSH_VERSION.*\)"|\1 @DISTRO@"|g' sh.h
+sed -i -e 's|\(@(#)MIRBSD KSH.*\)|\1 @DISTRO@|g' check.t
+
+# fill distro
 sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
+# sanity checks
+grep PLD/Linux check.t || exit 1
+grep PLD/Linux sh.h || exit 1
 
 # we'll need this later due to -DMKSH_GCC55009
 cat >rtchecks <<'EOF'
