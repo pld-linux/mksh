@@ -1,5 +1,8 @@
-%bcond_without	static
-%bcond_without	tests
+#
+# Conditional build:
+%bcond_without	static	# static version of mksh
+%bcond_without	tests	# rtchecks and test.sh checks
+#
 #
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
@@ -198,8 +201,8 @@ rm -rf $RPM_BUILD_ROOT
 %posttrans -p %add_etc_shells -p /bin/sh /bin/ksh
 
 
-%post static -p %add_etc_shells -p /bin/mksh.static
-%preun static -p %remove_etc_shells -p /bin/mksh.static
+%post	static -p %add_etc_shells -p /bin/mksh.static
+%preun	static -p %remove_etc_shells -p /bin/mksh.static
 
 %files
 %defattr(644,root,root,755)
