@@ -8,7 +8,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	46
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
@@ -198,8 +198,7 @@ rm -rf $RPM_BUILD_ROOT
 %post   -p %add_etc_shells -p /bin/sh /bin/ksh /bin/mksh
 %preun  -p %remove_etc_shells -p /bin/sh /bin/ksh /bin/mksh
 
-%posttrans -p %add_etc_shells -p /bin/sh /bin/ksh
-
+%posttrans -p %add_etc_shells -p /bin/sh /bin/ksh /bin/mksh
 
 %post	static -p %add_etc_shells -p /bin/mksh.static
 %preun	static -p %remove_etc_shells -p /bin/mksh.static
