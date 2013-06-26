@@ -8,7 +8,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	44
-Release:	2
+Release:	3
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
@@ -151,7 +151,7 @@ fi
 ./mksh rtchecks >rtchecks.got 2>&1
 if ! cmp --quiet rtchecks.got rtchecks.expected ; then
 	echo "rtchecks failed"
-	diff -Naurp %{SOURCE3} rtchecks.got
+	diff -Naurp rtchecks.expected rtchecks.got
 	exit 1
 fi
 ./test.sh -v $skip_tests
@@ -170,7 +170,7 @@ sh ./Build.sh -Q -r -j -c lto
 ./mksh rtchecks >rtchecks.got 2>&1
 if ! cmp --quiet rtchecks.got rtchecks.expected ; then
 	echo "rtchecks failed"
-	diff -Naurp %{SOURCE3} rtchecks.got
+	diff -Naurp rtchecks.expected rtchecks.got
 	exit 1
 fi
 %endif
