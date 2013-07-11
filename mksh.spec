@@ -8,7 +8,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	44
-Release:	4
+Release:	5
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
@@ -24,7 +24,7 @@ BuildRequires:	ed
 BuildRequires:	perl-base
 %endif
 %{?with_static:BuildRequires:   glibc-static}
-BuildRequires:	rpmbuild(macros) >= 1.667
+BuildRequires:	rpmbuild(macros) >= 1.670
 # is needed for /etc directory existence
 Requires(pre):	FHS
 Requires:	setup >= 2.4.6-2
