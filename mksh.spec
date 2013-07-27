@@ -2,13 +2,12 @@
 # Conditional build:
 %bcond_without	static	# static version of mksh
 %bcond_without	tests	# rtchecks and test.sh checks
-#
-#
+
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	44
-Release:	6
+Release:	7
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
