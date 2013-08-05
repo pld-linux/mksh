@@ -26,7 +26,7 @@ BuildRequires:	ed
 BuildRequires:	perl-base
 %endif
 %{?with_static:BuildRequires:   glibc-static}
-BuildRequires:	rpmbuild(macros) >= 1.462
+BuildRequires:	rpmbuild(macros) >= 1.670
 # is needed for /etc directory existence
 Requires(pre):	FHS
 Requires:	setup >= 2.4.6-2
