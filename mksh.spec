@@ -202,7 +202,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %triggerpostun -p <lua> -- pdksh
 if arg[2] ~= 0 then
-%add_etc_shells /bin/sh /bin/ksh /bin/mksh
+%lua_add_etc_shells /bin/sh /bin/ksh /bin/mksh
 end
 
 %files
