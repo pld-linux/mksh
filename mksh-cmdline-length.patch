@@ -1,11 +1,11 @@
---- mksh-40b/sh.h~	2011-10-15 20:27:37.000000000 +0200
-+++ mksh-40b/sh.h	2011-10-18 17:56:07.152596641 +0200
-@@ -381,7 +381,7 @@
- #define NOT		'!'	/* might use ^ (ie, [!...] vs [^..]) */
- #define NOT2		'^'
+--- mksh-48b/sh.h~	2013-10-15 09:18:13.000000000 +0200
++++ mksh-48b/sh.h	2013-10-15 09:18:46.706838235 +0200
+@@ -985,7 +985,7 @@
+ EXTERN char	*current_wd;
  
--#define LINE		4096	/* input line size */
-+#define LINE		16384	/* input line size */
- 
- EXTERN const char *safe_prompt; /* safe prompt if PS1 substitution fails */
- EXTERN const char initvsn[] I__("KSH_VERSION=@(#)MIRBSD KSH " MKSH_VERSION);
+ /* input line size */
+-#define LINE		(4096 - ALLOC_SIZE)
++#define LINE		(16384 - ALLOC_SIZE)
+ /*
+  * Minimum required space to work with on a line - if the prompt leaves
+  * less space than this on a line, the prompt is truncated.
