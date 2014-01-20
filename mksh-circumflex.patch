@@ -43,3 +43,15 @@ diff -ur mksh-40.org//tree.c mksh-40/tree.c
  			    c == '-' || c == ']' || c == '*' || c == '?'))
  				shf_putc(MAGIC, shf);
  			shf_putc(c, shf);
+diff -urN mksh.org/check.t mksh/check.t
+--- mksh.org/check.t	2014-01-11 19:10:02.000000000 +0100
++++ mksh/check.t	2014-01-20 14:12:37.924222697 +0100
+@@ -2085,7 +2085,7 @@
+ 	cbc
+ 	-bc cbc
+ 	abc bbc
+-	^bc abc bbc
++	!bc -bc ^bc cbc
+ 	!bc -bc ^bc cbc
+ ---
+ name: glob-range-2
