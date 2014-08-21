@@ -1,19 +1,19 @@
---- main.c~	2011-07-07 18:15:26.961632040 +0100
-+++ main.c	2011-07-07 18:15:50.664694256 +0100
-@@ -532,10 +532,14 @@
- 		char *env_file;
- 
- 		/* include $ENV */
--		env_file = substitute(substitute("${ENV:-" MKSHRC_PATH "}", 0),
--		    DOTILDE);
-+                env_file = substitute(substitute("${ENV}", 0), DOTILDE);
- 		if (*env_file != '\0')
- 			include(env_file, 0, NULL, true);
-+                else { 
-+			env_file = substitute(MKSHRC_PATH, DOTILDE);
-+			include("/etc/mkshrc", 0, NULL, true);
-+			include(env_file, 0, NULL, true);
-+                        }
- 	}
- 
- 	if (restricted) {
+--- mksh-50/main.c.orig	2014-08-21 18:13:38.072682886 +0200
++++ mksh-50/main.c	2014-08-21 18:29:13.715976954 +0200
+@@ -591,10 +591,14 @@
+ 		if (Flag(FLOGIN))
+ 			include(substitute("$HOME/.profile", 0), 0, NULL, true);
+ 		if (Flag(FTALKING)) {
+-			cp = substitute(substitute("${ENV:-" MKSHRC_PATH "}",
+-			    0), DOTILDE);
++			cp = substitute(substitute("${ENV}", 0), DOTILDE);
+ 			if (cp[0] != '\0')
+ 				include(cp, 0, NULL, true);
++			else {
++				cp = substitute(MKSHRC_PATH, DOTILDE);
++				include("/etc/mkshrc", 0, NULL, true);
++				include(cp, 0, NULL, true);
++			}
+ 		}
+ 	} else {
+ 		include(MKSH_SUID_PROFILE, 0, NULL, true);
