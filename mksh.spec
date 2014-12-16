@@ -7,7 +7,7 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	50d
-Release:	1
+Release:	2
 License:	BSD
 Group:		Applications/Shells
 Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
@@ -136,7 +136,7 @@ EOF
 install -d out
 
 CC="%{__cc}" \
-CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
+CFLAGS="%{rpmcflags} -DMKSH_GCC55009 -DMKSH_BINSHREDUCED" \
 LDFLAGS="%{rpmldflags}" \
 CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
@@ -159,7 +159,7 @@ mv mksh out/mksh.dynamic
 
 %if %{with static}
 CC="%{__cc}" \
-CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
+CFLAGS="%{rpmcflags} -DMKSH_GCC55009 -DMKSH_BINSHREDUCED" \
 LDFLAGS="%{rpmldflags} -static" \
 CPPFLAGS="%{rpmcppflags}" \
 sh ./Build.sh -Q -r -j -c lto
