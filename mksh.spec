@@ -10,7 +10,7 @@ Version:	50d
 Release:	4
 License:	BSD
 Group:		Applications/Shells
-Source0:	http://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
+Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
 # Source0-md5:	1c3882c07a760b23df1ad94ad0b4ed2e
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
@@ -81,8 +81,7 @@ zbliżonej do oryginalnej powłoki Korna z AT&T.
 W tym pakiecie jest mksh skonsolidowany statycznie.
 
 %prep
-%setup -qcT
-gzip -dc %{SOURCE0} | cpio -mid
+%setup -qc
 mv mksh/* .; rmdir mksh
 %patch100 -p3
 
