@@ -8,17 +8,18 @@
  #endif
  	"autoload=typeset -fu",
  	"functions=typeset -f",
---- mksh-49/mksh.1~	2014-01-11 20:10:06.000000000 +0200
-+++ mksh-49/mksh.1	2014-01-20 14:21:04.704670524 +0200
+
+--- mksh-50f/mksh.1~	2015-04-13 01:32:55.000000000 +0300
++++ mksh-50f/mksh.1	2015-04-22 12:28:32.070141365 +0300
 @@ -1131,7 +1131,6 @@
- nameref=\*(aqtypeset \-n\*(aq
  nohup=\*(aqnohup \*(aq
  r=\*(aqfc \-e \-\*(aq
+ source=\*(aqPATH=$PATH:. command .\*(aq
 -stop=\*(aqkill \-STOP\*(aq
  type=\*(aqwhence \-v\*(aq
  .Ed
  .Pp
---- mksh-49/check.t~	2014-01-11 20:10:02.000000000 +0200
+-- mksh-49/check.t~	2014-01-11 20:10:02.000000000 +0200
 +++ mksh-49/check.t	2014-01-20 14:21:32.202611748 +0200
 @@ -6766,7 +6766,6 @@
  	nohup='nohup '
