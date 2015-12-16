@@ -31,18 +31,6 @@ diff -ur mksh-40.org//sh.h mksh-40/sh.h
  
  #define LINE		4096	/* input line size */
  
-diff -ur mksh-40.org//tree.c mksh-40/tree.c
---- mksh-40.org//tree.c	2011-05-29 04:19:21.000000000 +0200
-+++ mksh-40/tree.c	2011-07-07 18:30:12.088149284 +0200
-@@ -289,7 +289,7 @@
- 		case CHAR:
- 			c = *wp++;
- 			if ((opmode & WDS_MAGIC) &&
--			    (ISMAGIC(c) || c == '[' || c == '!' ||
-+			    (ISMAGIC(c) || c == '[' || c == '!' || c == NOT2 ||
- 			    c == '-' || c == ']' || c == '*' || c == '?'))
- 				shf_putc(MAGIC, shf);
- 			shf_putc(c, shf);
 diff -urN mksh.org/check.t mksh/check.t
 --- mksh.org/check.t	2014-01-11 19:10:02.000000000 +0100
 +++ mksh/check.t	2014-01-20 14:12:37.924222697 +0100
