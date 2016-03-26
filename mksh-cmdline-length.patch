@@ -4,8 +4,8 @@
  EXTERN char	*current_wd;
  
  /* input line size */
--#define LINE		(4096 - ALLOC_SIZE)
-+#define LINE		(16384 - ALLOC_SIZE)
+-#define LINE		(4096 - ALLOC_OVERHEAD)
++#define LINE		(16384 - ALLOC_OVERHEAD)
  /*
   * Minimum required space to work with on a line - if the prompt leaves
   * less space than this on a line, the prompt is truncated.
