@@ -6,17 +6,16 @@
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	52c
+Version:	53a
 Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
-# Source0-md5:	cc3884e02314447e7b4a3073b8d65d1e
+# Source0-md5:	43fc3e32963cc1795a299bcec531d770
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
 Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
-Patch2:		%{name}-cmdline-length.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -79,11 +78,10 @@ W tym pakiecie jest mksh skonsolidowany statycznie.
 
 %prep
 %setup -qc
-mv mksh/* .; rmdir mksh
+%{__mv} mksh/* .; rmdir mksh
 
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 # sed rules instead of patch (needed update for every release)
 sed -i -e 's|\(#define.*MKSH_VERSION.*\)"|\1 @DISTRO@"|g' sh.h
