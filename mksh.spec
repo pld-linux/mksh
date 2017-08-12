@@ -1,17 +1,18 @@
 #
 # Conditional build:
+%bcond_with	lto	# enable link time optimisations (breaks tests)
 %bcond_without	static	# static version of mksh
 %bcond_without	tests	# rtchecks and test.sh checks
 
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	54
+Version:	56
 Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
-# Source0-md5:	be0a6fb93b4a5f927bcc1893bb6692f8
+# Source0-md5:	fedd42b11d2bda84921afcc8de3912e3
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
 Patch0:		%{name}-mkshrc_support.patch
@@ -135,7 +136,7 @@ CC="%{__cc}" \
 CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
 LDFLAGS="%{rpmldflags}" \
 CPPFLAGS="%{rpmcppflags}" \
-sh ./Build.sh -Q -r -j -c lto
+sh ./Build.sh -Q -r -j %{?with_lto:-c lto}
 
 # skip some tests if not on terminal
 if ! tty -s; then
@@ -158,7 +159,7 @@ CC="%{__cc}" \
 CFLAGS="%{rpmcflags} -DMKSH_GCC55009" \
 LDFLAGS="%{rpmldflags} -static" \
 CPPFLAGS="%{rpmcppflags}" \
-sh ./Build.sh -Q -r -j -c lto
+sh ./Build.sh -Q -r -j %{?with_lto:-c lto}
 
 %if %{with tests}
 ./test.sh -v $skip_tests
