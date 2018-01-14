@@ -3,11 +3,11 @@ diff -ur mksh-56.orig/eval.c mksh-56/eval.c
 +++ mksh-56/eval.c	2017-08-12 22:40:32.672676143 +0200
 @@ -1005,6 +1005,7 @@
  				switch (ord(c)) {
- 				case ord('['):
- 				case ord('!'):
-+				case ord(NOT2):
- 				case ord('-'):
- 				case ord(']'):
+ 				case ORD('['):
+ 				case ORD('!'):
++				case ORD(NOT2):
+ 				case ORD('-'):
+ 				case ORD(']'):
  					/*
 diff -ur mksh-56.orig/misc.c mksh-56/misc.c
 --- mksh-56.orig/misc.c	2017-08-12 22:10:26.321676398 +0200
@@ -16,8 +16,8 @@ diff -ur mksh-56.orig/misc.c mksh-56/misc.c
  	char *subp;
  
  	/* check for negation */
--	if (ISMAGIC(p[0]) && ord(p[1]) == ord('!')) {
-+	if (ISMAGIC(p[0]) && (ord(p[1]) == ord('!') || ord(p[1]) == ord(NOT2))) {
+-	if (ISMAGIC(p[0]) && ord(p[1]) == ORD('!')) {
++	if (ISMAGIC(p[0]) && (ord(p[1]) == ORD('!') || ord(p[1]) == ORD(NOT2))) {
  		p += 2;
  		negated = true;
  	}
@@ -27,7 +27,7 @@ diff -ur mksh-56.orig/sh.h mksh-56/sh.h
 @@ -550,6 +550,7 @@
   */
  #define MAGIC		KSH_BEL	/* prefix for *?[!{,} during expand */
- #define ISMAGIC(c)	(ord(c) == ord(MAGIC))
+ #define ISMAGIC(c)	(ord(c) == ORD(MAGIC))
 +#define NOT2		'^'
  
  EXTERN const char *safe_prompt; /* safe prompt if PS1 substitution fails */

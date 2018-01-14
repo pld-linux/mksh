@@ -7,12 +7,12 @@
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	56b
+Version:	56c
 Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
-# Source0-md5:	6b65b3798f5f6a057fa541fc08cc2be9
+# Source0-md5:	4799a9ac6d55871d79ba66713d928663
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
 Patch0:		%{name}-mkshrc_support.patch
