@@ -18,6 +18,9 @@ fi
 # EDITING FUNCTIONS
 set -o emacs
 bind '^I'=complete-list >/dev/null 2>&1
+# search history with prefix support
+bind '^XA'=search-history-up
+bind '^XB'=search-history-down
 
 # SYSTEM WIDE ALIASES ETC.
 for i in /etc/shrc.d/*.sh; do
