@@ -4,15 +4,17 @@
 %bcond_without	static	# static version of mksh
 %bcond_without	tests	# rtchecks and test.sh checks
 
+%define		vernr	%(echo %{version} | tr -d 'a-z')
+
 Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
-Version:	59
+Version:	59b
 Release:	1
 License:	BSD
 Group:		Applications/Shells
 Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
-# Source0-md5:	995ddf33b4b52d48bb9a648ce996f791
+# Source0-md5:	dce6abffc2036288540b9ba11dfb2ec8
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
 Patch0:		%{name}-mkshrc_support.patch
@@ -86,7 +88,7 @@ W tym pakiecie jest mksh skonsolidowany statycznie.
 
 # sed rules instead of patch (needed update for every release)
 sed -i -e 's|\(#define.*MKSH_VERSION.*\)"|\1 @DISTRO@"|g' sh.h
-sed -i -e 's|\(KSH R%{version}.*\)|\1 @DISTRO@|g' check.t
+sed -i -e 's|\(KSH R%{vernr}.*\)|\1 @DISTRO@|g' check.t
 
 # fill distro
 sed -i -e 's#@DISTRO@#PLD/Linux 3.0#g' check.t sh.h
