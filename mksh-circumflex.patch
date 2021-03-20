@@ -1,41 +1,7 @@
-diff -ur mksh-56.orig/eval.c mksh-56/eval.c
---- mksh-56.orig/eval.c	2017-08-12 22:10:26.321676398 +0200
-+++ mksh-56/eval.c	2017-08-12 22:40:32.672676143 +0200
-@@ -1005,6 +1005,7 @@
- 				switch (ord(c)) {
- 				case ORD('['):
- 				case ORD('!'):
-+				case ORD(NOT2):
- 				case ORD('-'):
- 				case ORD(']'):
- 					/*
-diff -ur mksh-56.orig/misc.c mksh-56/misc.c
---- mksh-56.orig/misc.c	2017-08-12 22:10:26.321676398 +0200
-+++ mksh-56/misc.c	2017-08-12 22:40:32.672676143 +0200
-@@ -966,7 +966,7 @@
- 	char *subp;
- 
- 	/* check for negation */
--	if (ISMAGIC(p[0]) && ord(p[1]) == ORD('!')) {
-+	if (ISMAGIC(p[0]) && (ord(p[1]) == ORD('!') || ord(p[1]) == ORD(NOT2))) {
- 		p += 2;
- 		negated = true;
- 	}
-diff -ur mksh-56.orig/sh.h mksh-56/sh.h
---- mksh-56.orig/sh.h	2017-08-12 22:10:26.325009789 +0200
-+++ mksh-56/sh.h	2017-08-12 22:40:32.696009488 +0200
-@@ -550,6 +550,7 @@
-  */
- #define MAGIC		KSH_BEL	/* prefix for *?[!{,} during expand */
- #define ISMAGIC(c)	(ord(c) == ORD(MAGIC))
-+#define NOT2		'^'
- 
- EXTERN const char *safe_prompt; /* safe prompt if PS1 substitution fails */
- 
-diff -ur mksh-56.orig/check.t mksh-56/check.t
---- mksh-56.orig/check.t	2017-08-12 22:10:26.321676398 +0200
-+++ mksh-56/check.t	2017-08-12 22:41:46.886083258 +0200
-@@ -2438,7 +2438,7 @@
+diff -urNp -x '*.orig' mksh-59c.org/check.t mksh-59c/check.t
+--- mksh-59c.org/check.t	2020-10-31 04:53:30.000000000 +0100
++++ mksh-59c/check.t	2021-03-20 19:53:40.714261839 +0100
+@@ -2484,7 +2484,7 @@ expected-stdout:
  	!bc +bc ,bc 0bc 1bc ^bc cbc
  	!bc +bc ,bc -bc 0bc 1bc ^bc cbc
  	abc bbc
@@ -44,3 +10,37 @@ diff -ur mksh-56.orig/check.t mksh-56/check.t
  	+bc ,bc -bc
  	-bc 0bc 1bc
  ---
+diff -urNp -x '*.orig' mksh-59c.org/eval.c mksh-59c/eval.c
+--- mksh-59c.org/eval.c	2020-05-05 23:34:54.000000000 +0200
++++ mksh-59c/eval.c	2021-03-20 19:53:40.717595272 +0100
+@@ -1108,6 +1108,7 @@ expand(
+ 				switch (ord(c)) {
+ 				case ORD('['):
+ 				case ORD('!'):
++				case ORD(NOT2):
+ 				case ORD('-'):
+ 				case ORD(']'):
+ 					/*
+diff -urNp -x '*.orig' mksh-59c.org/misc.c mksh-59c/misc.c
+--- mksh-59c.org/misc.c	2020-08-27 21:53:12.000000000 +0200
++++ mksh-59c/misc.c	2021-03-20 19:53:40.717595272 +0100
+@@ -1018,7 +1018,7 @@ gmatch_cclass(const unsigned char *pat,
+ 	char *subp;
+ 
+ 	/* check for negation */
+-	if (ISMAGIC(p[0]) && ord(p[1]) == ORD('!')) {
++	if (ISMAGIC(p[0]) && (ord(p[1]) == ORD('!') || ord(p[1]) == ORD(NOT2))) {
+ 		p += 2;
+ 		negated = true;
+ 	}
+diff -urNp -x '*.orig' mksh-59c.org/sh.h mksh-59c/sh.h
+--- mksh-59c.org/sh.h	2020-10-31 04:53:33.000000000 +0100
++++ mksh-59c/sh.h	2021-03-20 19:53:40.717595272 +0100
+@@ -580,6 +580,7 @@ extern int __cdecl setegid(gid_t);
+  */
+ #define MAGIC		KSH_BEL	/* prefix for *?[!{,} during expand */
+ #define ISMAGIC(c)	(ord(c) == ORD(MAGIC))
++#define NOT2		'^'
+ 
+ EXTERN const char *safe_prompt; /* safe prompt if PS1 substitution fails */
+ 
