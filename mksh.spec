@@ -207,7 +207,7 @@ end
 %files
 %defattr(644,root,root,755)
 %doc dot.mkshrc
-%config(noreplace,missingok) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/mkshrc
 %attr(755,root,root) %{_bindir}/mksh
 %attr(755,root,root) %{_bindir}/ksh
 %attr(755,root,root) %{_bindir}/sh
