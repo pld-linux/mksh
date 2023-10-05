@@ -1,0 +1,45 @@
+diff -urN mksh.org/funcs.c mksh/funcs.c
+--- mksh.org/funcs.c	2020-08-27 21:53:11.000000000 +0200
++++ mksh/funcs.c	2023-10-05 19:06:16.456613978 +0200
+@@ -98,7 +98,6 @@
+ 	{Tsgbreak, c_brkcont},
+ 	{T__builtin, c_builtin},
+ 	{Tbuiltin, c_builtin},
+-	{Tbcat, c_cat},
+ 	{Tcd, c_cd},
+ 	/* dash compatibility hack */
+ 	{"chdir", c_cd},
+@@ -152,9 +151,6 @@
+ #ifdef MKSH_PRINTF_BUILTIN
+ 	{"~printf", c_printf},
+ #endif
+-#if HAVE_SELECT
+-	{"sleep", c_sleep},
+-#endif
+ #ifdef __MirBSD__
+ 	/* alias to "true" for historical reasons */
+ 	{"domainname", c_true},
+From 2f8a1b53b98c24c6506afdf1dd272febd49e65d2 Mon Sep 17 00:00:00 2001
+From: tg <tg@mirbsd.org>
+Date: Sun, 24 Jan 2021 19:41:07 +0000
+Subject: [PATCH] fix builtin removal-related fuckup
+
+---
+ check.t | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/check.t b/check.t
+index f22cf367a..c6e25d712 100644
+--- a/check.t
++++ b/check.t
+@@ -150,9 +150,8 @@ name: selftest-direct-builtin-call
+ description:
+ 	Check that direct builtin calls work
+ stdin:
+-	ln -s "$__progname" cat || cp "$__progname" cat
+ 	ln -s "$__progname" echo || cp "$__progname" echo
+-	./echo -c 'echo  foo' | ./cat -u
++	./echo -c 'echo  foo'
+ expected-stdout:
+ 	-c echo  foo
+ ---
