@@ -36,14 +36,15 @@ diff -urNp mksh-59c.org/check.t mksh-59c/check.t
 diff -urNp mksh-59c.org/main.c mksh-59c/main.c
 --- mksh-59c.org/main.c	2020-10-01 22:29:21.000000000 +0200
 +++ mksh-59c/main.c	2026-09-08 16:21:20.628320872 +0200
-@@ -977,9 +977,17 @@ unwind(int i)
+@@ -977,9 +977,18 @@ unwind(int i)
  	if (i == LEXIT || ((i == LERROR || i == LERREXT || i == LINTR) &&
  	    sigtraps[ksh_SIGEXIT].trap &&
  	    (!Flag(FTALKING) || Flag(FERREXIT)))) {
 +		/*
-+		 * $? after a trap action must be what it was before it
-+		 * (POSIX); nested here (signal or another trap) runtrap()
-+		 * never gets its is_last call, so restore the status here
++		 * POSIX: $? after a trap action is the value it had before
++		 * the action ran. When we get here from a signal or from
++		 * another trap, runtrap() is nested and never sees is_last,
++		 * so restore it here.
 +		 */
 +		int saved_exstat = exstat;
 +
