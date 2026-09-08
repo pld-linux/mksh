@@ -1,0 +1,56 @@
+diff -urNp mksh-59c.org/check.t mksh-59c/check.t
+--- mksh-59c.org/check.t	2020-10-31 04:53:30.000000000 +0100
++++ mksh-59c/check.t	2026-09-08 16:21:28.753672808 +0200
+@@ -8042,6 +8042,31 @@ expected-stderr:
+ 	subshell_exit
+ 	shell_exit
+ ---
++name: exit-trap-4
++description:
++	Check that the exit status is kept when the EXIT trap runs
++	because the shell was killed by an untrapped signal
++stdin:
++	trap 'echo EXtrap' EXIT
++	kill -TERM $$
++	echo not reached
++expected-stdout:
++	EXtrap
++expected-exit: 143
++---
++name: exit-trap-5
++description:
++	Check that the exit status is kept when the EXIT trap runs
++	from exit in another trap
++stdin:
++	trap 'exit 5' USR1
++	trap 'echo EXtrap' EXIT
++	kill -USR1 $$
++	echo not reached
++expected-stdout:
++	EXtrap
++expected-exit: 5
++---
+ name: exit-trap-interactive
+ description:
+ 	Check that interactive shell doesn't exit via EXIT trap on syntax error
+diff -urNp mksh-59c.org/main.c mksh-59c/main.c
+--- mksh-59c.org/main.c	2020-10-01 22:29:21.000000000 +0200
++++ mksh-59c/main.c	2026-09-08 16:21:20.628320872 +0200
+@@ -977,9 +977,17 @@ unwind(int i)
+ 	if (i == LEXIT || ((i == LERROR || i == LERREXT || i == LINTR) &&
+ 	    sigtraps[ksh_SIGEXIT].trap &&
+ 	    (!Flag(FTALKING) || Flag(FERREXIT)))) {
++		/*
++		 * $? after a trap action must be what it was before it
++		 * (POSIX); nested here (signal or another trap) runtrap()
++		 * never gets its is_last call, so restore the status here
++		 */
++		int saved_exstat = exstat;
++
+ 		++trap_nested;
+ 		runtrap(&sigtraps[ksh_SIGEXIT], trap_nested == 1);
+ 		--trap_nested;
++		exstat = saved_exstat;
+ 		i = LLEAVE;
+ 	} else if (Flag(FERREXIT) && (i == LERROR || i == LERREXT || i == LINTR)) {
+ 		++trap_nested;
