@@ -1,7 +1,7 @@
 diff -urNp mksh-59c.org/check.t mksh-59c/check.t
 --- mksh-59c.org/check.t	2020-10-31 04:53:30.000000000 +0100
-+++ mksh-59c/check.t	2026-09-08 16:21:28.753672808 +0200
-@@ -8042,6 +8042,31 @@ expected-stderr:
++++ mksh-59c/check.t	2026-09-08 18:39:55.578780709 +0200
+@@ -8042,6 +8042,55 @@ expected-stderr:
  	subshell_exit
  	shell_exit
  ---
@@ -30,12 +30,36 @@ diff -urNp mksh-59c.org/check.t mksh-59c/check.t
 +	EXtrap
 +expected-exit: 5
 +---
++name: exit-trap-6
++description:
++	Check that exit with an argument in the EXIT trap overrides
++	the status the trap was entered with
++stdin:
++	trap 'echo EXtrap; exit 7' EXIT
++	exit 9
++expected-stdout:
++	EXtrap
++expected-exit: 7
++---
++name: exit-trap-7
++description:
++	Check that exit with an argument in the EXIT trap overrides
++	the status the trap was entered with from another trap
++stdin:
++	trap 'exit 5' USR1
++	trap 'echo EXtrap; exit 7' EXIT
++	kill -USR1 $$
++	echo not reached
++expected-stdout:
++	EXtrap
++expected-exit: 7
++---
  name: exit-trap-interactive
  description:
  	Check that interactive shell doesn't exit via EXIT trap on syntax error
 diff -urNp mksh-59c.org/main.c mksh-59c/main.c
 --- mksh-59c.org/main.c	2020-10-01 22:29:21.000000000 +0200
-+++ mksh-59c/main.c	2026-09-08 16:21:20.628320872 +0200
++++ mksh-59c/main.c	2026-09-08 18:40:02.340513452 +0200
 @@ -977,9 +977,18 @@ unwind(int i)
  	if (i == LEXIT || ((i == LERROR || i == LERREXT || i == LINTR) &&
  	    sigtraps[ksh_SIGEXIT].trap &&
