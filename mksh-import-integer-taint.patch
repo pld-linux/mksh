@@ -1,0 +1,305 @@
+integer/typeset -i on a variable imported from the environment evaluated its
+content as an arithmetic expression, running $(...) in array subscripts.
+https://github.com/MirBSD/mksh/commit/0d347a56d1ca1d17c17cf3998139cda8d3202ea8
+https://github.com/MirBSD/mksh/commit/b2351466ef934bfa8d884201735b5fc4a79625f8
+PLD additions, not upstream: a 1#c constant must end the value,
+and attribute-only typeset (-l/-u/-L/-R/-Z) must not clear the taint.
+
+diff --git a/check.t b/check.t
+index c506faf..f1c20f8 100644
+--- a/check.t
++++ b/check.t
+@@ -13266,6 +13266,60 @@ expected-stdout:
+ 	2=\x7Cfoo-e \x4B
+ 	3=\x7Cfoo-e \x4B
+ ---
++name: env-intvars
++description:
++	Check that importing integers fails except for numbers
++stdin:
++	unset foo bar
++	print 1 $foo , $(typeset -p bar) .
++	print 2 $(foo=123 "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[123]=baz' "$__progname" -c 'typeset -p bar') .
++	print 3 $(foo='abc[$(echo >&2 fowled)0]' "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[$(echo >&2 fowled)0]=baz' "$__progname" -c 'typeset -p bar') .
++	print 4 $(foo=0123 "$__progname" +o posix -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[0123]=baz' "$__progname" +o posix -c 'typeset -p bar') .
++	# ksh93 does not do this:
++	print 5 $(foo=0123 "$__progname" -o posix -c 'integer foo; print -- $foo' 2>&1) .
++	# at import time FPOSIX is not yet set
++	print 6 $(foo=0x123 "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[0x123]=baz' "$__progname" -c 'typeset -p bar') .
++	print 7 $(foo=12#123 "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[12#123]=baz' "$__progname" -c 'typeset -p bar') .
++	print 8 $(foo=1+1 "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[1+1]=baz' "$__progname" -c 'typeset -p bar') .
++	print 9 $(a=1 b=2 c=a "$__progname" -c 'typeset -p c; c=b; typeset -p c; integer c; typeset -p c') .
++	print 0 $(a=1 b=2 c=a "$__progname" -c 'typeset -p c;      typeset -p c; integer c; typeset -p c') .
++expected-stdout:
++	1 , .
++	2 123 , set -A bar typeset -x bar[123]=baz .
++	3 0 , .
++	4 123 , set -A bar typeset -x bar[123]=baz .
++	5 8#123 .
++	6 16#123 , set -A bar typeset -x bar[291]=baz .
++	7 12#123 , set -A bar typeset -x bar[171]=baz .
++	8 0 , .
++	9 typeset -x c=a typeset -x c=b typeset -i -x c=2 .
++	0 typeset -x c=a typeset -x c=a typeset -i -x c=0 .
++---
++name: env-intvars-2
++description:
++	Check that base-1 constants and attribute changes do not let
++	imported variables evaluate expressions
++stdin:
++	print 1 $(foo='1#a[$(echo >&2 fowled)0]' "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[1#a$(echo >&2 fowled)]=baz' "$__progname" -c 'typeset -p bar' 2>&1) .
++	print 2 $(foo=1#a "$__progname" -c 'integer foo; print -- $foo' 2>&1) , \
++	    $(env 'bar[1#a]=baz' "$__progname" -c 'typeset -p bar') .
++	print 3 $(foo='a[$(echo >&2 fowled)0]' "$__progname" -c 'typeset -l foo; integer foo; print -- $foo' 2>&1) .
++	print 4 $(foo='a[$(echo >&2 fowled)0]' "$__progname" -c 'typeset -R30 foo; integer foo; print -- $foo' 2>&1) .
++	print 5 $(foo=12 "$__progname" -c 'typeset -l foo; integer foo; print -- $foo' 2>&1) .
++expected-stdout:
++	1 0 , .
++	2 1#a , set -A bar typeset -x bar[97]=baz .
++	3 0 .
++	4 0 .
++	5 12 .
++---
+ name: utilities-getopts-1
+ description:
+ 	getopts sets OPTIND correctly for unparsed option
+diff --git a/var.c b/var.c
+index e3c92eb..25f6852 100644
+--- a/var.c
++++ b/var.c
+@@ -3,7 +3,7 @@
+ /*-
+  * Copyright (c) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+  *		 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
+- *		 2019
++ *		 2019, 2021
+  *	mirabilos <m@mirbsd.org>
+  *
+  * Provided that these terms and disclaimer and all copyright notices
+@@ -29,7 +29,7 @@
+ #include <sys/sysctl.h>
+ #endif
+ 
+-__RCSID("$MirOS: src/bin/mksh/var.c,v 1.237 2020/06/22 17:11:03 tg Exp $");
++__RCSID("$MirOS: src/bin/mksh/var.c,v 1.238 2021/05/02 05:50:47 tg Exp $");
+ 
+ /*-
+  * Variables
+@@ -57,6 +57,7 @@ static void getspec(struct tbl *);
+ static void setspec(struct tbl *);
+ static void unsetspec(struct tbl *, bool);
+ static int getint(struct tbl *, mksh_ari_u *, bool);
++static int getnum(const char *, mksh_ari_u *, bool, bool, bool);
+ static const char *array_index_calc(const char *, bool *, uint32_t *);
+ static struct tbl *vtypeset(int *, const char *, uint32_t, uint32_t, int, int);
+ 
+@@ -494,6 +495,7 @@ setstr(struct tbl *vq, const char *s, int error_ok)
+ 			vq->flag |= ALLOC;
+ 			vq->type = 0;
+ 		}
++		vq->flag &= ~IMPORT;
+ 		afree(salloc, ATEMP);
+ 	} else {
+ 		/* integer dest */
+@@ -527,10 +529,6 @@ setint(struct tbl *vq, mksh_ari_t n)
+ static int
+ getint(struct tbl *vp, mksh_ari_u *nump, bool arith)
+ {
+-	mksh_uari_t c, num = 0, base = 10;
+-	const char *s;
+-	bool have_base = false, neg = false;
+-
+ 	if (vp->flag & SPECIAL)
+ 		getspec(vp);
+ 	/* XXX is it possible for ISSET to be set and val.s to be NULL? */
+@@ -540,7 +538,16 @@ getint(struct tbl *vp, mksh_ari_u *nump, bool arith)
+ 		nump->i = vp->val.i;
+ 		return (vp->type);
+ 	}
+-	s = vp->val.s + vp->type;
++	return (getnum(vp->val.s + vp->type, nump, arith,
++	    Flag(FPOSIX) && !(vp->flag & ZEROFIL), false));
++}
++
++static int
++getnum(const char *s, mksh_ari_u *nump, bool arith, bool psxoctal,
++    bool whole)
++{
++	mksh_uari_t c, num = 0, base = 10;
++	bool have_base = false, neg = false;
+ 
+ 	do {
+ 		c = (unsigned char)*s++;
+@@ -561,8 +568,7 @@ getint(struct tbl *vp, mksh_ari_u *nump, bool arith)
+ 			base = 16;
+ 			++s;
+ 			goto getint_c_style_base;
+-		} else if (Flag(FPOSIX) && ctype(s[0], C_DIGIT) &&
+-		    !(vp->flag & ZEROFIL)) {
++		} else if (psxoctal && ctype(s[0], C_DIGIT)) {
+ 			/* interpret as octal (deprecated) */
+ 			base = 8;
+  getint_c_style_base:
+@@ -579,10 +585,12 @@ getint(struct tbl *vp, mksh_ari_u *nump, bool arith)
+ 			if ((base = num) == 1) {
+ 				/* mksh-specific extension */
+ 				unsigned int wc;
++				size_t n;
+ 
+-				if (!UTFMODE)
++				if (!UTFMODE) {
+ 					wc = *(const unsigned char *)s;
+-				else if (utf_mbtowc(&wc, s) == (size_t)-1)
++					n = wc ? 1 : 0;
++				} else if ((n = utf_mbtowc(&wc, s)) == (size_t)-1) {
+ 					/* OPTU-8 -> OPTU-16 */
+ 					/*
+ 					 * (with a twist: 1#\uEF80 converts
+@@ -590,6 +598,11 @@ getint(struct tbl *vp, mksh_ari_u *nump, bool arith)
+ 					 * not round-tripping correctly XXX)
+ 					 */
+ 					wc = 0xEF00 + rtt2asc(*s);
++					n = 1;
++				}
++				/* validators must not pass a trailing expression */
++				if (whole && s[n] != '\0')
++					return (-1);
+ 				nump->u = (mksh_uari_t)wc;
+ 				return (1);
+ 			} else if (base > 36)
+@@ -641,10 +654,11 @@ setint_v(struct tbl *vq, struct tbl *vp, bool arith)
+ void
+ setint_n(struct tbl *vq, mksh_ari_t num, int newbase)
+ {
+-	if (!(vq->flag & INTEGER) && (vq->flag & ALLOC)) {
+-		vq->flag &= ~ALLOC;
++	if (!(vq->flag & INTEGER)) {
++		if (vq->flag & ALLOC)
++			afree(vq->val.s, vq->areap);
++		vq->flag &= ~(ALLOC | IMPORT);
+ 		vq->type = 0;
+-		afree(vq->val.s, vq->areap);
+ 	}
+ 	vq->val.i = num;
+ 	if (newbase != 0)
+@@ -798,7 +812,7 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 			return (maybe_errorf(ep, 1, Tf_sD_s, var,
+ 			    "reference variable can't be an array"), NULL);
+ 		len = array_ref_len(val);
+-		if (len == 0)
++		if (len < 3)
+ 			return (NULL);
+ 		/*
+ 		 * IMPORT is only used when the shell starts up and is
+@@ -808,11 +822,20 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 		 * would be a major security hole.
+ 		 */
+ 		if (set & IMPORT) {
+-			size_t i;
+-
+-			for (i = 1; i < len - 1; i++)
+-				if (!ctype(val[i], C_DIGIT))
+-					return (NULL);
++			mksh_ari_u num;
++
++			len -= 2;
++			tvar = len < sizeof(tvarbuf) ? tvarbuf :
++			    alloc(len + 1, ATEMP);
++			memcpy(tvar, val + 1, len);
++			tvar[len] = '\0';
++			if (getnum(tvar, &num, true, false, true) == -1)
++				len = 0;
++			if (tvar != tvarbuf)
++				afree(tvar, ATEMP);
++			if (!len)
++				return (NULL);
++			len += 2;
+ 		}
+ 		val += len;
+ 	}
+@@ -961,7 +984,7 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 		 */
+ 		for (t = vpbase; t; t = t->u.array) {
+ 			bool fake_assign;
+-			char *s = NULL;
++			const char *s = NULL;
+ 			char *free_me = NULL;
+ 
+ 			fake_assign = (t->flag & ISSET) && (!val || t != vp) &&
+@@ -983,16 +1006,33 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 				t->type = 0;
+ 				t->flag &= ~ALLOC;
+ 			}
++			if (set & INTEGER) {
++				/*
++				 * Don't change base if assignment is to
++				 * be done, in case assignment fails.
++				 */
++				if (base > 0 && (!val || t != vp))
++					t->type = base;
++				/*
++				 * Do not permit content from the
++				 * environment to e.g. execute commands.
++				 */
++				if ((t->flag & IMPORT) && fake_assign) {
++					mksh_ari_u num;
++
++					if (getnum(s, &num, true,
++					    tobool(Flag(FPOSIX)), true) == -1)
++						s = "0";
++					clr |= IMPORT;
++				}
++			}
+ 			t->flag = (t->flag | set) & ~clr;
+-			/*
+-			 * Don't change base if assignment is to be
+-			 * done, in case assignment fails.
+-			 */
+-			if ((set & INTEGER) && base > 0 && (!val || t != vp))
+-				t->type = base;
+ 			if (set & (LJUST|RJUST|ZEROFIL))
+ 				t->u2.field = field;
+ 			if (fake_assign) {
++				/* setstr clears IMPORT; attributes must not untaint */
++				uint32_t imported = t->flag & IMPORT;
++
+ 				if (!setstr(t, s, KSH_RETURN_ERROR)) {
+ 					/*
+ 					 * Somewhat arbitrary action
+@@ -1010,6 +1050,7 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 						t->type = 0;
+ 					}
+ 				}
++				t->flag |= imported;
+ 				afree(free_me, t->areap);
+ 			}
+ 		}
+@@ -1019,7 +1060,7 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 
+ 	if (vappend) {
+ 		size_t tlen;
+-		if ((vp->flag & (ISSET|ALLOC|SPECIAL|INTEGER|UCASEV_AL|LCASEV|LJUST|RJUST)) != (ISSET|ALLOC)) {
++		if ((vp->flag & (ISSET|ALLOC|SPECIAL|INTEGER|UCASEV_AL|LCASEV|LJUST|RJUST|IMPORT)) != (ISSET|ALLOC)) {
+ 			/* cannot special-case this */
+ 			strdup2x(tvar, str_val(vp), val);
+ 			val = tvar;
+@@ -1038,9 +1079,11 @@ vtypeset(int *ep, const char *var, uint32_t set, uint32_t clr,
+ 			/* done after assignment to override default */
+ 			if (base > 0)
+ 				vp->type = base;
+-		} else
++		} else {
+ 			/* setstr can't fail (readonly check already done) */
+ 			setstr(vp, val, KSH_RETURN_ERROR | 0x4);
++			vp->flag |= (set & IMPORT);
++		}
+ 
+ 		/* came here from vappend? need to free temp val */
+ 		if (vappend)

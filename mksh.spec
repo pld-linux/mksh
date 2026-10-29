@@ -10,10 +10,10 @@ Summary:	MirBSD Korn Shell
 Summary(pl.UTF-8):	Powłoka Korna z MirBSD
 Name:		mksh
 Version:	59c
-Release:	4
+Release:	5
 License:	BSD
 Group:		Applications/Shells
-Source0:	https://www.mirbsd.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
+Source0:	https://mbsd.evolvis.org/MirOS/dist/mir/mksh/%{name}-R%{version}.tgz
 # Source0-md5:	99f8ac3c1d8a30b913d509f1969a4aaa
 Source1:	%{name}-mkshrc
 Source2:	get-source.sh
@@ -21,6 +21,9 @@ Patch0:		%{name}-mkshrc_support.patch
 Patch1:		%{name}-circumflex.patch
 Patch2:         drop-builtins.patch
 Patch3:		%{name}-exit-trap-status.patch
+Patch4:		%{name}-import-integer-taint.patch
+Patch5:		%{name}-restricted-histfile.patch
+Patch6:		%{name}-typeset-p-unset.patch
 URL:		https://www.mirbsd.org/mksh.htm
 %if %{with tests}
 BuildRequires:	ed
@@ -89,6 +92,9 @@ W tym pakiecie jest mksh skonsolidowany statycznie.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
+%patch -P5 -p1
+%patch -P6 -p1
 
 sed -i -e 's|fgrep|grep -F|g' check.t
 
@@ -174,7 +180,7 @@ sh ./Build.sh -Q -r -j %{?with_lto:-c lto}
 ./mksh rtchecks >rtchecks.got 2>&1
 if ! cmp --quiet rtchecks.got rtchecks.expected ; then
 	echo "rtchecks failed"
-	diff -Naurp %{SOURCE3} rtchecks.got
+	diff -Naurp rtchecks.expected rtchecks.got
 	exit 1
 fi
 %endif

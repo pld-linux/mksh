@@ -1,0 +1,65 @@
+typeset -p printed an unset exported variable as set to '', so eval of its
+output turned unset into empty
+https://github.com/MirBSD/mksh/commit/ae681dac0364162eceabe9ddba61312456c0e4bd (Debian bookworm typeset-p-fix.diff)
+
+diff --git a/check.t b/check.t
+index f1c20f8..87032e6 100644
+--- a/check.t
++++ b/check.t
+@@ -8840,6 +8840,41 @@ expected-stdout:
+ 	<12345678910 345678920
+ 	<               .  aẞ> 2)
+ ---
++name: typeset-unset
++description:
++	Check that typeset -p correctly distinguishes unset and empty
++stdin:
++	unset u
++	typeset -p u
++	echo 1 ${u-a} ${u:-b} .
++	x1=$(typeset -p u)
++	export u
++	typeset -p u
++	echo 2 ${u-a} ${u:-b} .
++	x2=$(typeset -p u)
++	u=
++	typeset -p u
++	echo 3 ${u-a} ${u:-b} .
++	x3=$(typeset -p u)
++	unset u
++	eval "$x1"
++	echo 4 ${u-a} ${u:-b} .
++	unset u
++	eval "$x2"
++	echo 5 ${u-a} ${u:-b} .
++	unset u
++	eval "$x3"
++	echo 6 ${u-a} ${u:-b} .
++expected-stdout:
++	1 a b .
++	typeset -x u
++	2 a b .
++	typeset -x u=''
++	3 b .
++	4 a b .
++	5 a b .
++	6 b .
++---
+ name: utf8bom-1
+ description:
+ 	Check that the UTF-8 Byte Order Mark is ignored as the first
+diff --git a/var.c b/var.c
+index 25f6852..add2b3d 100644
+--- a/var.c
++++ b/var.c
+@@ -2265,8 +2265,8 @@ c_typeset_vardump(struct tbl *vp, uint32_t flag, int thing, int any_set,
+ 			shprintf("%s[%lu]", vp->name, arrayindex(vp));
+ 		else
+ 			shf_puts(vp->name, shl_stdout);
+-		if ((!thing && !flag && pflag) ||
+-		    (thing == '-' && (vp->flag & ISSET))) {
++		if (((!thing && !flag && pflag) || thing == '-') &&
++		    (vp->flag & ISSET)) {
+ 			s = str_val(vp);
+ 			shf_putc('=', shl_stdout);
+ 			/* AT&T ksh can't have justified integers... */

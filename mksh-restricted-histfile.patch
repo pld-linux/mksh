@@ -1,0 +1,79 @@
+restricted shell could point HISTFILE at any file and overwrite it with history
+https://github.com/MirBSD/mksh/commit/e6cb7f9dbf2a4367361792424850c8a93dd385c6
+
+diff --git a/main.c b/main.c
+index 6b6351c..03e079e 100644
+--- a/main.c
++++ b/main.c
+@@ -90,7 +90,7 @@ static const char *initcoms[] = {
+ };
+ 
+ static const char *restr_com[] = {
+-	Ttypeset, Tdr, TPATH, TENV, TSHELL, NULL
++	Ttypeset, Tdr, TENV, "HISTFILE", TPATH, TSHELL, NULL
+ };
+ 
+ static bool initio_done;
+diff --git a/mksh.1 b/mksh.1
+index 6cfb70c..20f7a80 100644
+--- a/mksh.1
++++ b/mksh.1
+@@ -309,31 +309,32 @@ files:
+ .Pp
+ .Bl -bullet -compact
+ .It
+-The
+-.Ic cd
+-.Po and Ic chdir Pc
+-command is disabled.
+-.It
+-The
+-.Ev SHELL ,
+-.Ev ENV
+-and
++Command names cannot be specified with pathnames, absolute or relative,
++nor using the
++.Fl p
++option of the
++.Ic command
++built-in utility; the
++.Ev ENV ,
+ .Ev PATH
++and
++.Ev SHELL
+ parameters cannot be changed.
+ .It
+-Command names can't be specified with absolute or relative paths.
+-.It
+-The
+-.Fl p
+-option of the built-in command
+-.Ic command
+-can't be used.
++The current location is fixed: the
++.Ic cd
++command and its alias
++.Ic chdir
++is disabled.
+ .It
+ Redirections that create files can't be used (i.e.\&
+ .Dq Li \*(Gt ,
+ .Dq Li \*(Gt\*(Ba ,
+ .Dq Li \*(Gt\*(Gt ,
+-.Dq Li \*(Lt\*(Gt ) .
++.Dq Li \*(Lt\*(Gt ) ,
++and the
++.Ev HISTFILE
++parameter cannot be changed.
+ .El
+ .It Fl s
+ The shell reads commands from standard input; all non-option arguments
+@@ -1316,7 +1317,7 @@ not
+ .Dq Li D
+ and
+ .Dq Li E .
+-This behavior is POSIX compliant, but incompatible with some other shell
++This behavior is POSIX compliant but incompatible with some other shell
+ implementations which do field splitting on the word which contained the
+ substitution or use
+ .Dv IFS
